@@ -1,0 +1,11 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { GameSessionsService } from './game-sessions.service';
+import { GameSession } from './entities/game-session.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([GameSession])],
+  providers: [GameSessionsService],
+  exports: [GameSessionsService],
+})
+export class GameSessionsModule {}
