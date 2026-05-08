@@ -23,35 +23,38 @@ Create a platform where players can subscribe, create campaigns, and participate
 
 - **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS + Socket.io-client
 - **Backend:** NestJS (Node.js + TypeScript)
-- **Databases:** PostgreSQL + Redis
+- **Databases:** SQLite (dev) / PostgreSQL (prod) + Redis mock (dev) / Redis (prod)
 - **Real-time:** Socket.io (WebSockets)
 - **AI:** OpenAI GPT-4o / GPT-4o-mini
 
 ## Prerequisites
 
 - Node.js 20+
-- PostgreSQL 15+
-- Redis 7+
 - OpenAI API key
+
+> **Note:** PostgreSQL and Redis are optional for development. The project runs with SQLite and in-memory Redis mock by default.
 
 ## Quick Start
 
-### 1. Start Infrastructure
+### 1. Clone and setup
 
-Using Docker:
 ```bash
-docker-compose up -d
+git clone https://github.com/oscarfalero/rolsito.git
+cd rolsito
+git checkout sp1-core-engine
 ```
-
-Or install PostgreSQL and Redis manually.
 
 ### 2. Configure Environment
 
 ```bash
-# Backend
-cp backend/.env.example backend/.env
-# Edit backend/.env and add your OPENAI_API_KEY
+cd backend
+cp .env.example .env
+# Edit .env and add your OPENAI_API_KEY
 ```
+
+The default `.env` already works without Docker:
+- `USE_SQLITE=true` - Uses SQLite file database
+- `USE_REDIS_MOCK=true` - Uses in-memory Redis
 
 ### 3. Start Backend
 
@@ -63,7 +66,7 @@ npm run start:dev
 
 Backend will run on http://localhost:4000
 
-### 4. Start Frontend
+### 4. Start Frontend (in another terminal)
 
 ```bash
 cd frontend
@@ -72,6 +75,25 @@ npm run dev
 ```
 
 Frontend will run on http://localhost:3000
+
+### 5. Open the app
+
+Go to http://localhost:3000 and create an account to start playing!
+
+---
+
+## Alternative: Using PostgreSQL + Redis (Docker)
+
+If you prefer using PostgreSQL and Redis with Docker:
+
+```bash
+# Start containers
+docker-compose up -d
+
+# Update backend/.env
+USE_SQLITE=false
+USE_REDIS_MOCK=false
+```
 
 ## Project Structure
 
@@ -88,7 +110,8 @@ rolsito/
 │   │   ├── llm/         # OpenAI integration
 │   │   ├── memory/      # Session memory/context
 │   │   └── common/      # Shared utilities (Redis)
-│   └── .env
+│   ├── .env             # Environment variables
+│   └── rolsito.dev.db   # SQLite database (auto-created)
 ├── frontend/            # React SPA
 │   ├── src/
 │   │   ├── pages/       # Route pages
@@ -98,7 +121,7 @@ rolsito/
 │   │   ├── services/    # API clients
 │   │   └── types/       # TypeScript types
 │   └── index.html
-├── docker-compose.yml   # PostgreSQL + Redis
+├── docker-compose.yml   # PostgreSQL + Redis (optional)
 └── .env.example
 ```
 
@@ -125,16 +148,19 @@ rolsito/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DB_HOST` | PostgreSQL host | localhost |
-| `DB_PORT` | PostgreSQL port | 5432 |
-| `DB_USER` | PostgreSQL user | rolsito |
-| `DB_PASSWORD` | PostgreSQL password | rolsito123 |
-| `DB_NAME` | PostgreSQL database | rolsito |
-| `REDIS_HOST` | Redis host | localhost |
-| `REDIS_PORT` | Redis port | 6379 |
+| `USE_SQLITE` | Use SQLite instead of PostgreSQL | `true` |
+| `SQLITE_DB_PATH` | SQLite database file path | `./rolsito.dev.db` |
+| `USE_REDIS_MOCK` | Use in-memory Redis mock | `true` |
+| `DB_HOST` | PostgreSQL host (if USE_SQLITE=false) | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_USER` | PostgreSQL user | `rolsito` |
+| `DB_PASSWORD` | PostgreSQL password | `rolsito123` |
+| `DB_NAME` | PostgreSQL database | `rolsito` |
+| `REDIS_HOST` | Redis host (if USE_REDIS_MOCK=false) | `localhost` |
+| `REDIS_PORT` | Redis port | `6379` |
 | `JWT_SECRET` | JWT signing secret | - |
 | `OPENAI_API_KEY` | OpenAI API key | - |
-| `PORT` | Backend port | 4000 |
+| `PORT` | Backend port | `4000` |
 
 ## Development
 
