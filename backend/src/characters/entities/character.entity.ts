@@ -24,7 +24,7 @@ export class Character extends BaseEntity {
   @Column({ default: 1 })
   level: number;
 
-  @Column({ type: 'jsonb', default: {} })
+  @Column({ type: 'json', default: '{}' })
   stats: Record<string, any>;
 
   @Column({ type: 'text', nullable: true })

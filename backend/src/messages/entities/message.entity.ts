@@ -21,7 +21,7 @@ export class Message extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'jsonb', default: {} })
+  @Column({ type: 'json', default: '{}' })
   metadata: Record<string, any>;
 
   @ManyToOne(() => GameSession, (session) => session.messages)

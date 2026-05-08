@@ -17,7 +17,7 @@ export class GameSession extends BaseEntity {
   @Column({ default: 'active' })
   status: string;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ nullable: true })
   endedAt: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.sessions)

@@ -13,7 +13,6 @@ import { MemoryModule } from '../memory/memory.module';
 import { DmModule } from '../dm/dm.module';
 import { CampaignsModule } from '../campaigns/campaigns.module';
 import { CharactersModule } from '../characters/characters.module';
-import { RedisService } from '../common/services/redis.service';
 
 @Module({
   imports: [
@@ -34,6 +33,6 @@ import { RedisService } from '../common/services/redis.service';
     CampaignsModule,
     CharactersModule,
   ],
-  providers: [GameGateway, GameService, TurnService, RedisService],
+  providers: [GameGateway, GameService, TurnService],
 })
 export class GameModule {}
