@@ -7,6 +7,8 @@ import CampaignNew from './pages/CampaignNew';
 import CampaignDetail from './pages/CampaignDetail';
 import GamePlay from './pages/GamePlay';
 import CharacterNew from './pages/CharacterNew';
+import CharacterSheet from './pages/CharacterSheet';
+import ScenesManager from './pages/ScenesManager';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -74,6 +76,22 @@ export default function App() {
         element={
           <PrivateRoute>
             <CharacterNew />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/campaigns/:id/characters/:characterId"
+        element={
+          <PrivateRoute>
+            <CharacterSheet />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/campaigns/:id/scenes"
+        element={
+          <PrivateRoute>
+            <ScenesManager />
           </PrivateRoute>
         }
       />

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import databaseConfig from './config/database.config';
 import { CommonModule } from './common/common.module';
 import { UsersModule } from './users/users.module';
@@ -14,6 +15,9 @@ import { GameModule } from './game/game.module';
 import { DmModule } from './dm/dm.module';
 import { MemoryModule } from './memory/memory.module';
 import { LlmModule } from './llm/llm.module';
+import { ItemsModule } from './items/items.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { ScenesModule } from './scenes/scenes.module';
 
 @Module({
   imports: [
@@ -28,6 +32,7 @@ import { LlmModule } from './llm/llm.module';
       }),
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     CommonModule,
     UsersModule,
     AuthModule,
@@ -40,6 +45,9 @@ import { LlmModule } from './llm/llm.module';
     DmModule,
     MemoryModule,
     LlmModule,
+    ItemsModule,
+    InventoryModule,
+    ScenesModule,
   ],
 })
 export class AppModule {}

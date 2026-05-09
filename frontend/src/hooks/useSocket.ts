@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '../stores/auth.store';
-import { GameMessage } from '../types';
+import { GameMessage, Scene } from '../types';
 
 interface UseSocketReturn {
   socket: Socket | null;
@@ -13,6 +12,7 @@ interface UseSocketReturn {
   isDmTyping: boolean;
   typingUsers: string[];
   players: any[];
+  currentScene: Scene | null;
   sendAction: (content: string, characterId?: string) => void;
   startTyping: () => void;
   stopTyping: () => void;
@@ -27,6 +27,7 @@ export function useSocket(campaignId: string): UseSocketReturn {
   const [isDmTyping, setIsDmTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [players, setPlayers] = useState<any[]>([]);
+  const [currentScene, setCurrentScene] = useState<Scene | null>(null);
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
@@ -92,6 +93,10 @@ export function useSocket(campaignId: string): UseSocketReturn {
       ]);
     });
 
+    newSocket.on('scene_changed', (scene) => {
+      setCurrentScene(scene);
+    });
+
     newSocket.on('turn:changed', (data) => {
       setCurrentTurn(data);
       setIsMyTurn(data.userId === user?.id);
@@ -148,6 +153,7 @@ export function useSocket(campaignId: string): UseSocketReturn {
     isDmTyping,
     typingUsers,
     players,
+    currentScene,
     sendAction,
     startTyping,
     stopTyping,

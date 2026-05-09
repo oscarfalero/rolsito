@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { GameService } from './game.service';
 import { TurnService } from './turn.service';
 import { DmService } from '../dm/dm.service';
@@ -34,6 +35,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private campaignsService: CampaignsService,
     private charactersService: CharactersService,
   ) {}
+
+  @OnEvent('scene.changed')
+  handleSceneChanged(payload: { campaignId: string; scene: any }) {
+    this.server.to(`campaign:${payload.campaignId}`).emit('scene_changed', payload.scene);
+  }
 
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
@@ -180,7 +186,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(roomName).emit('dm:typing', {});
 
       // Generate DM response
-      const dmMessage = await this.dmService.generateDmResponse(
+      const { message: dmMessage, sceneChanged } = await this.dmService.generateDmResponse(
         campaignId,
         session.id,
         content,
@@ -194,6 +200,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         content: dmMessage.content,
         createdAt: dmMessage.createdAt.toISOString(),
       });
+
+      if (sceneChanged) {
+        this.server.to(roomName).emit('dm:scene_changed', {});
+      }
 
       // Advance turn
       const nextPlayerId = await this.turnService.advanceTurn(campaignId);

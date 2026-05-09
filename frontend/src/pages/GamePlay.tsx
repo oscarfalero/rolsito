@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSocket } from '../hooks/useSocket';
-import { GameMessage } from '../types';
+import { GameMessage, CampaignState } from '../types';
+import { campaignStateService } from '../services/api.service';
 
 function ChatMessage({ message }: { message: GameMessage }) {
   if (message.senderType === 'dm') {
@@ -60,7 +61,8 @@ export default function GamePlay() {
   const { id } = useParams<{ id: string }>();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const [campaignState, setCampaignState] = useState<CampaignState | null>(null);
 
   const {
     isConnected,
@@ -70,10 +72,15 @@ export default function GamePlay() {
     isDmTyping,
     typingUsers,
     players,
+    currentScene,
     sendAction,
     startTyping,
     stopTyping,
   } = useSocket(id!);
+
+  useEffect(() => {
+    campaignStateService.getState(id!).then(setCampaignState);
+  }, [id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -107,6 +114,9 @@ export default function GamePlay() {
     const result = Math.floor(Math.random() * sides) + 1;
     sendAction(`[Rolls a d${sides}: ${result}]`);
   };
+
+  const scene = currentScene || campaignState?.currentScene;
+  const myCharacter = campaignState?.myCharacter;
 
   return (
     <div className="h-screen bg-gray-900 flex">
@@ -152,6 +162,37 @@ export default function GamePlay() {
         </div>
 
         <div className="p-4 border-t border-gray-700">
+          <h3 className="text-sm font-medium text-gray-400 uppercase mb-2">Character</h3>
+          {myCharacter ? (
+            <div className="space-y-2">
+              <div className="text-sm text-white font-medium">{myCharacter.name}</div>
+              <div className="flex space-x-2 text-xs">
+                <span className="text-red-400">HP: {myCharacter.currentHp}/{myCharacter.maxHp}</span>
+                <span className="text-blue-400">AC: {myCharacter.ac}</span>
+              </div>
+              {myCharacter.inventory && myCharacter.inventory.length > 0 && (
+                <div className="mt-2">
+                  <div className="text-xs text-gray-500 uppercase">Inventory</div>
+                  {myCharacter.inventory.map((inv) => (
+                    <div key={inv.id} className="text-xs text-gray-300 flex justify-between">
+                      <span>{inv.item.name}</span>
+                      <span className="text-gray-500">x{inv.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to={`/campaigns/${id}/characters/new`}
+              className="text-sm text-indigo-400 hover:text-indigo-300"
+            >
+              + Create Character
+            </Link>
+          )}
+        </div>
+
+        <div className="p-4 border-t border-gray-700">
           <h3 className="text-sm font-medium text-gray-400 uppercase mb-2">Turn Status</h3>
           {isMyTurn ? (
             <div className="text-green-400 text-sm font-medium">It's your turn!</div>
@@ -167,6 +208,14 @@ export default function GamePlay() {
       <div className="flex-1 flex flex-col">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {scene && (
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-bold text-indigo-400">{scene.name}</h3>
+              <p className="text-gray-300 text-sm">{scene.description}</p>
+              <span className="text-xs text-gray-500">{scene.type}</span>
+            </div>
+          )}
+
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
               <p className="text-lg mb-2">Welcome to the adventure!</p>

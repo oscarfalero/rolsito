@@ -53,12 +53,20 @@ export default function CampaignDetail() {
             </div>
             <div className="flex space-x-2">
               {isOwner && (
-                <Link
-                  to={`/campaigns/${id}/play`}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
-                >
-                  Start Game
-                </Link>
+                <>
+                  <Link
+                    to={`/campaigns/${id}/scenes`}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm"
+                  >
+                    Scenes
+                  </Link>
+                  <Link
+                    to={`/campaigns/${id}/play`}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+                  >
+                    Start Game
+                  </Link>
+                </>
               )}
               {!isMember && !isOwner && (
                 <button
@@ -83,6 +91,14 @@ export default function CampaignDetail() {
               <span className="font-medium">AI Model:</span> {campaign.dmModel}
             </div>
           </div>
+
+          {campaign.currentScene && (
+            <div className="bg-gray-700 rounded p-3 mt-2">
+              <div className="text-xs text-gray-500 uppercase">Current Scene</div>
+              <div className="text-white font-medium">{campaign.currentScene.name}</div>
+              <div className="text-sm text-gray-400">{campaign.currentScene.description}</div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,19 +140,26 @@ export default function CampaignDetail() {
             {characters?.length ? (
               <div className="space-y-3">
                 {characters.map((character: any) => (
-                  <div key={character.id} className="bg-gray-700 rounded p-3">
+                  <Link
+                    key={character.id}
+                    to={`/campaigns/${id}/characters/${character.id}`}
+                    className="bg-gray-700 rounded p-3 block hover:bg-gray-600 transition-colors"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="text-white font-medium">{character.name}</div>
                         <div className="text-sm text-gray-400">
                           {character.race} {character.class} (Level {character.level})
                         </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          HP: {character.currentHp}/{character.maxHp} | AC: {character.ac}
+                        </div>
                       </div>
                       <div className="text-xs text-gray-500">
                         by {character.user?.username}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (

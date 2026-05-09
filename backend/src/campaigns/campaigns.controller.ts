@@ -29,6 +29,12 @@ export class CampaignsController {
     return this.campaignsService.findOne(id);
   }
 
+  @Get(':id/state')
+  @UseGuards(JwtAuthGuard)
+  async getState(@Param('id') id: string, @Request() req) {
+    return this.campaignsService.getCampaignState(id, req.user.userId);
+  }
+
   @Post(':id/join')
   @UseGuards(JwtAuthGuard)
   async join(@Param('id') id: string, @Request() req) {

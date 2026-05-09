@@ -89,4 +89,80 @@ export const characterService = {
   },
 };
 
+export const itemService = {
+  async getByCampaign(campaignId: string) {
+    const response = await api.get(`/campaigns/${campaignId}/items`);
+    return response.data;
+  },
+  async create(campaignId: string, data: { name: string; description?: string; type: string }) {
+    const response = await api.post(`/campaigns/${campaignId}/items`, data);
+    return response.data;
+  },
+  async update(id: string, data: Partial<{ name: string; description?: string; type: string }>) {
+    const response = await api.patch(`/items/${id}`, data);
+    return response.data;
+  },
+  async remove(id: string) {
+    await api.delete(`/items/${id}`);
+  },
+};
+
+export const sceneService = {
+  async getByCampaign(campaignId: string) {
+    const response = await api.get(`/campaigns/${campaignId}/scenes`);
+    return response.data;
+  },
+  async create(campaignId: string, data: { name: string; description?: string; type: string }) {
+    const response = await api.post(`/campaigns/${campaignId}/scenes`, data);
+    return response.data;
+  },
+  async update(id: string, data: Partial<{ name: string; description?: string; type: string }>) {
+    const response = await api.patch(`/scenes/${id}`, data);
+    return response.data;
+  },
+  async remove(id: string) {
+    await api.delete(`/scenes/${id}`);
+  },
+  async activate(campaignId: string, sceneId: string) {
+    const response = await api.post(`/campaigns/${campaignId}/scenes/${sceneId}/activate`);
+    return response.data;
+  },
+};
+
+export const inventoryService = {
+  async getByCharacter(characterId: string) {
+    const response = await api.get(`/characters/${characterId}/inventory`);
+    return response.data;
+  },
+  async addItem(characterId: string, data: { itemId: string; quantity: number }) {
+    const response = await api.post(`/characters/${characterId}/inventory`, data);
+    return response.data;
+  },
+  async updateQuantity(characterId: string, itemId: string, quantity: number) {
+    const response = await api.patch(`/characters/${characterId}/inventory/${itemId}`, { quantity });
+    return response.data;
+  },
+  async removeItem(characterId: string, itemId: string) {
+    await api.delete(`/characters/${characterId}/inventory/${itemId}`);
+  },
+};
+
+export const campaignStateService = {
+  async getState(campaignId: string) {
+    const response = await api.get(`/campaigns/${campaignId}/state`);
+    return response.data;
+  },
+};
+
+export const characterManagementService = {
+  async getOne(id: string) {
+    const response = await api.get(`/characters/${id}`);
+    return response.data;
+  },
+  async update(id: string, data: Partial<{ currentHp?: number; backstory?: string }>) {
+    const response = await api.patch(`/characters/${id}`, data);
+    return response.data;
+  },
+};
+
 export default api;

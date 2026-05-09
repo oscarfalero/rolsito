@@ -4,6 +4,8 @@ import { User } from '../../users/entities/user.entity';
 import { CampaignMember } from '../../campaign-members/entities/campaign-member.entity';
 import { Character } from '../../characters/entities/character.entity';
 import { GameSession } from '../../game-sessions/entities/game-session.entity';
+import { Scene } from '../../scenes/entities/scene.entity';
+import { Item } from '../../items/entities/item.entity';
 
 @Entity('campaigns')
 export class Campaign extends BaseEntity {
@@ -28,6 +30,13 @@ export class Campaign extends BaseEntity {
   @Column()
   createdById: string;
 
+  @Column({ nullable: true })
+  currentSceneId: string;
+
+  @ManyToOne(() => Scene, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'currentSceneId' })
+  currentScene: Scene;
+
   @ManyToOne(() => User, (user) => user.campaigns)
   @JoinColumn({ name: 'createdById' })
   createdBy: User;
@@ -40,4 +49,10 @@ export class Campaign extends BaseEntity {
 
   @OneToMany(() => GameSession, (session) => session.campaign)
   sessions: GameSession[];
+
+  @OneToMany(() => Scene, (scene) => scene.campaign)
+  scenes: Scene[];
+
+  @OneToMany(() => Item, (item) => item.campaign)
+  items: Item[];
 }
